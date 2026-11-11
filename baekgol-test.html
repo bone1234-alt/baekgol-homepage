@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>백골 혈맹 | 회원 전용 홈페이지</title>
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at top,#39231b,#0b0b0e 60%);color:#f3e5cf;font:15px/1.6 "Malgun Gothic",sans-serif}
+header{text-align:center;padding:65px 15px;background:linear-gradient(145deg,#17171d,#48251b,#090c12);border-bottom:3px solid #b78842}
+.logo{font-size:65px}
+h1{font: bold clamp(44px,7vw,80px) Georgia,serif;color:#f1cc80;text-shadow:3px 5px #46251e;margin:7px}
+header p{color:#eddfc5;font-size:18px}
+nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:15px;background:#151313;border-bottom:1px solid #705337}
+nav a{color:#f0ca8d;text-decoration:none;padding:10px 15px;border:1px solid #745536;border-radius:6px;background:#211914}
+main{max-width:1100px;margin:auto;padding:22px 14px}
+.banner{padding:20px;border:1px solid #a07641;background:#302017;border-radius:10px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{background:linear-gradient(#28221c,#121113);border:1px solid #755838;border-radius:12px;overflow:hidden}
+.card h2{background:#39251b;color:#f2c77a;padding:13px 18px;margin:0;font-size:21px}
+.content{padding:18px}
+.wide{grid-column:1/-1}
+.item{padding:12px 0;border-bottom:1px solid #4b3b2c;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.item:last-child{border:0}
+button{cursor:pointer;background:#853025;border:1px solid #c88a52;color:white;border-radius:6px;padding:9px 15px;font:inherit}
+button.secondary{background:#332b26}
+input,textarea{background:#111;color:white;border:1px solid #8b6745;padding:9px;border-radius:6px;font:inherit;max-width:100%}
+textarea{width:100%;min-height:80px}
+label{display:block;margin-top:14px;color:#edc78c}
+small{color:#bcb0a0}
+details{margin-top:20px;padding:18px;border:1px solid #86613c;border-radius:9px;background:#211a16}
+summary{cursor:pointer;font-weight:bold;color:#f1c580}
+footer{text-align:center;padding:35px;color:#aa9b85}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}header{padding:40px 10px}nav a{flex:1 1 42%;text-align:center;padding:9px 5px}}
+
+[hidden]{display:none!important}
+button:disabled{opacity:.45;cursor:wait}
+a{color:#f1c580}
+#entry{min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(ellipse at 50% 10%,#5a3024,#1c1519 55%,#090b0f)}
+.login-panel{width:min(100%,520px);padding:30px;background:linear-gradient(145deg,#2e2420,#131217);border:1px solid #b7874b;border-radius:16px;box-shadow:0 24px 80px #0009}
+.login-panel .logo{text-align:center;font-size:70px}
+.login-panel h1{text-align:center;font-size:clamp(35px,8vw,57px)}
+.login-panel .sub{text-align:center;color:#eed0a1;letter-spacing:2px;font-size:12px;margin-bottom:22px}
+.login-panel input{width:100%;font-size:16px;padding:12px}
+.login-panel button{margin-top:10px}
+.message{min-height:24px;color:#f9cf8e;white-space:pre-wrap;overflow-wrap:anywhere}
+.noticebox{margin:12px 0;padding:14px;background:#2a211d;border-left:3px solid #c99b5d;border-radius:4px}
+.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 24px;background:#171313;border-bottom:1px solid #795436}
+.toolbar small{color:#edd2aa}
+nav{position:sticky;top:0;z-index:3}
+.row-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.count{font-size:12px;color:#d9c4a4;margin-right:8px}
+.names{color:#aaa096;font-size:12px;margin-top:5px}
+.member-list{min-width:0;flex:1}
+.muted{color:#baa997}
+#siteStatus,#adminNotice{white-space:pre-wrap}
+#marketItems .post{border-bottom:1px solid #4b3b2c;padding:13px 0}
+.post-title{font-weight:bold;color:#f1c580;overflow-wrap:anywhere}
+.post-body{white-space:pre-wrap;overflow-wrap:anywhere}
+#marketForm input{width:100%}
+#marketForm select{color:#fff;background:#171313;border:1px solid #8b6745;border-radius:6px;padding:9px}
+.admin-block{padding:20px;border:1px solid #906b43;border-radius:12px;background:#241c19;margin-top:20px}
+.admin-block textarea{min-height:100px}
+.admin-block input{width:100%}
+.modal-btn{background:#3b3029}
+@media(max-width:700px){.item{align-items:flex-start;flex-direction:column} .row-actions{width:100%}.login-panel{padding:20px}header{padding:44px 10px}}
+</style>
+</head>
+<body>
+<section id="entry">
+  <div class="login-panel">
+    <div class="logo">💀⚔️</div><h1>백골 혈맹</h1>
+    <div class="sub">LINEAGE CLASSIC · MEMBERS ONLY</div>
+    <p id="authMessage" class="message" role="status"></p>
+    <div id="formArea">
+      <div class="row-actions"><button id="loginTab">로그인</button><button id="joinTab" class="secondary">회원가입 신청</button></div>
+      <h2 id="authTitle">혈맹원 로그인</h2>
+      <form id="authForm">
+        <div id="nicknameBox" hidden><label for="joinNickname">게임 닉네임</label><input id="joinNickname" maxlength="24" autocomplete="nickname"></div>
+        <label for="authEmail">이메일</label><input id="authEmail" type="email" autocomplete="email" required>
+        <label for="authPassword">비밀번호 (8자 이상)</label><input id="authPassword" type="password" minlength="8" autocomplete="current-password" required>
+        <p><button type="submit" id="authSubmit">로그인</button></p>
+      </form>
+    </div>
+    <div id="pendingArea" hidden>
+      <h2>⏳ 운영진 승인 대기</h2>
+      <p>회원가입이 접수되었습니다. 운영진의 승인을 받은 뒤 입장할 수 있습니다.</p>
+      <div class="row-actions"><button id="checkApproval">승인 상태 새로고침</button><button class="secondary" data-logout>로그아웃</button></div>
+    </div>
+    <div id="rejectedArea" hidden><h2>가입 승인되지 않음</h2><p>운영진에게 문의해 주세요.</p><button data-logout>로그아웃</button></div>
+    <p><small>회원 전용 페이지 · 가입 승인은 운영진이 처리합니다.</small></p>
+  </div>
+</section>
+<div id="memberApp" hidden>
+  <header>
+    <div class="logo">💀⚔️</div>
+    <div style="color:#f3c982;letter-spacing:3px">LINEAGE CLASSIC · BAEKGOL CLAN</div>
+    <h1>백골 혈맹</h1>
+    <p>의리는 뼈에 새기고, 전장은 이름으로 지배한다.</p>
+  </header>
+  <div class="toolbar"><small id="welcome"></small><button class="secondary" data-logout>로그아웃</button></div>
+  <nav>
+    <a href="#notice">📜 공지사항</a>
+    <a href="#intro">🛡️ 혈맹소개</a>
+    <a href="#boss">🐉 보스탐 시간표&참여</a>
+    <a href="#siege">🏰 공성참여</a>
+    <a href="#market">💰 아이템 내판</a>
+  </nav>
+  <main>
+    <div class="banner">⚔️ 백골 혈맹에 오신 것을 환영합니다! <small>승인된 혈맹원만 현재 데이터를 열람할 수 있습니다.</small><div id="siteStatus" class="message"></div></div>
+    <div class="grid">
+      <section class="card" id="notice"><h2>📜 공지사항</h2><div class="content" id="noticeText"></div></section>
+      <section class="card" id="intro"><h2>🛡️ 혈맹소개</h2><div class="content"><p>쟁·전투·보스탐·공성전 함께하는 백골 혈맹!</p><b>운영진 명단</b><div id="officers"></div></div></section>
+      <section class="card wide" id="boss"><h2>🐉 보스탐 시간표 & 참여</h2><div class="content"><small>신청 및 취소는 서버에 저장되며 다른 혈맹원에게도 반영됩니다.</small><div id="bossList"></div></div></section>
+      <section class="card" id="siege"><h2>🏰 공성참여</h2><div class="content"><h3 id="siegeName"></h3><p>📍 <span id="siegePlace"></span> · 🕢 <span id="siegeTime"></span> 집결</p><div class="row-actions"><button id="siegeJoin">참여 신청</button><span id="siegeCount" class="count"></span></div><div id="siegeNames" class="names"></div></div></section>
+      <section class="card" id="market"><h2>💰 아이템 내판</h2><div class="content">
+        <p><small>승인된 혈맹원만 작성·열람할 수 있는 간단한 거래 게시판입니다. 거래 책임은 당사자에게 있습니다.</small></p>
+        <form id="marketForm">
+          <label for="postKind">구분</label><select id="postKind"><option>판매</option><option>구매</option></select>
+          <label for="postTitle">아이템명 / 제목</label><input id="postTitle" maxlength="100" required placeholder="예: +7 장검 내판">
+          <label for="postDetails">내용</label><textarea id="postDetails" maxlength="1000" placeholder="가격·수량·연락 방법 등 (민감한 개인정보는 입력하지 마세요)"></textarea>
+          <p><button type="submit" id="postSubmit">게시글 등록</button></p>
+        </form>
+        <div id="marketItems"></div>
+      </div></section>
+    </div>
+    <section class="admin-block" id="adminSection" hidden>
+      <h2>👑 운영진 전용 관리</h2><p><small>여기서 수정하면 승인된 혈맹원 모두에게 동일하게 적용됩니다.</small></p>
+      <h3>회원가입 승인</h3><div id="approvalList"></div>
+      <h3>공지 · 운영진 · 일정 수정</h3>
+      <label for="eNotice">공지사항</label><textarea id="eNotice"></textarea>
+      <label for="eOfficers">운영진 (직책:닉네임, 쉼표로 구분)</label><textarea id="eOfficers"></textarea>
+      <label for="eBoss">보스탐 (보스명|시간, 쉼표로 구분)</label><textarea id="eBoss"></textarea>
+      <label for="eSiegeName">공성전 이름</label><input id="eSiegeName">
+      <label for="ePlace">집결 장소</label><input id="ePlace">
+      <label for="eTime">집결 시간</label><input id="eTime" placeholder="19:30">
+      <p><button id="adminSave">수정 내용 전체 저장</button></p><p id="adminNotice" class="message"></p>
+    </section>
+  </main>
+  <footer>☠️ 백골 혈맹 · 비공식 팬 커뮤니티</footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+const SUPABASE_URL="https://gxtzytwuiejbzdcailty.supabase.co";
+const SUPABASE_KEY="sb_publishable_dYemgC3PUWlwb_t41o2Gmg_q7hC_-fM";
+const REDIRECT_URL="https://bone1234-alt.github.io/baekgol-homepage/";
+const g=id=>document.getElementById(id);
+let db=null, user=null, profile=null, cfg=null, registrations=[], posts=[], joinMode=false;
+try {
+ if(!window.supabase) throw Error("Supabase 라이브러리를 불러오지 못했습니다.");
+ db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+} catch(err) {g("authMessage").textContent="연결 오류: "+err.message;}
+function message(t) {g("authMessage").textContent=t||"";}
+function authView(part) {
+ g("entry").hidden=false;g("memberApp").hidden=true;
+ g("formArea").hidden=part!=="form";
+ g("pendingArea").hidden=part!=="pending";
+ g("rejectedArea").hidden=part!=="rejected";
+}
+function changeMode(isJoin) {
+ joinMode=isJoin;g("nicknameBox").hidden=!joinMode;g("joinNickname").required=joinMode;
+ g("authTitle").textContent=joinMode?"혈맹원 가입 신청":"혈맹원 로그인";
+ g("authSubmit").textContent=joinMode?"가입 신청":"로그인";
+ g("authPassword").autocomplete=joinMode?"new-password":"current-password";
+ authView("form");message("");
+}
+g("loginTab").onclick=()=>changeMode(false);
+g("joinTab").onclick=()=>changeMode(true);
+function asText(value,fallback="") {return typeof value==="string"?value:fallback;}
+function elem(tag,text,cls) {const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;}
+function isAdmin() {return profile?.role==="admin"&&profile?.status==="approved";}
+function membersFor(type,id) {return registrations.filter(x=>x.event_type===type&&x.event_id===id);}
+function row(parent,left,right) {
+ const div=elem("div",undefined,"item");div.append(elem("span",left),elem("span",right));parent.append(div);
+}
+async function loadProfile() {
+ const r=await db.auth.getUser();if(r.error||!r.data.user) {user=null;profile=null;authView("form");return;}
+ user=r.data.user;
+ const p=await db.from("profiles").select("id,nickname,role,status").eq("id",user.id).maybeSingle();
+ if(p.error)throw p.error;
+ profile=p.data;
+ if(!profile) {authView("pending");message("프로필이 아직 생성되지 않았습니다. 운영진에게 문의하세요.");return;}
+ if(profile.status==="pending") {authView("pending");message("");return;}
+ if(profile.status!=="approved") {authView("rejected");message("");return;}
+ await refreshContent();
+ g("welcome").textContent=(profile.nickname||"혈맹원")+" 님, 환영합니다.";
+ g("adminSection").hidden=!isAdmin();
+ g("entry").hidden=true;g("memberApp").hidden=false;message("");
+ if(isAdmin())await loadApprovals();
+}
+async function refreshContent() {
+ const [c,s,p]=await Promise.all([
+   db.from("bg_content").select("body").eq("id","main").single(),
+   db.from("bg_signups").select("user_id,event_type,event_id,nickname,created_at"),
+   db.from("bg_market_posts").select("id,user_id,nickname,kind,title,details,created_at").order("created_at",{ascending:false}).limit(100)
+ ]);
+ if(c.error)throw Error("공지 데이터 조회 실패: "+c.error.message+" (Supabase 설정 SQL을 먼저 적용했는지 확인하세요)");
+ if(s.error)throw Error("참여 명단 조회 실패: "+s.error.message);
+ if(p.error)throw Error("내판 게시판 조회 실패: "+p.error.message);
+ cfg=c.data.body;registrations=s.data||[];posts=p.data||[];
+ render();
+}
+async function refreshAfterAction() {
+ try {await refreshContent();g("siteStatus").textContent="";}
+ catch(err) {g("siteStatus").textContent="오류: "+err.message;}
+}
+function render() {
+ g("noticeText").textContent=asText(cfg.notice);
+ g("siegeName").textContent=asText(cfg.siegeName);
+ g("siegePlace").textContent=asText(cfg.place);
+ g("siegeTime").textContent=asText(cfg.time);
+ g("officers").replaceChildren();
+ asText(cfg.officers).split(",").filter(Boolean).forEach(item=>{const [role,...names]=item.split(":");row(g("officers"),role||"운영진",names.join(":")||"");});
+ g("bossList").replaceChildren();
+ (Array.isArray(cfg.bosses)?cfg.bosses:[]).forEach(b=>{
+   const d=elem("div",undefined,"item");const left=elem("div",undefined,"member-list");
+   left.append(elem("strong",asText(b.name,"보스")+" · "+asText(b.time,"미정")));
+   const list=membersFor("boss",b.id);
+   left.append(elem("div",list.length?"참여: "+list.map(p=>p.nickname).join(", "):"현재 신청자 없음","names"));
+   const right=elem("div",undefined,"row-actions");right.append(elem("span",list.length+"명","count"));
+   const mine=list.some(x=>x.user_id===user.id);
+   const button=elem("button",mine?"참여 취소":"참여 신청",mine?"secondary":"");
+   button.onclick=()=>toggleSignup("boss",b.id,mine,button);
+   right.append(button);d.append(left,right);g("bossList").append(d);
+ });
+ const siegeList=membersFor("siege","main");const mySiege=siegeList.some(x=>x.user_id===user.id);
+ g("siegeJoin").textContent=mySiege?"참여 취소":"참여 신청";
+ g("siegeJoin").onclick=()=>toggleSignup("siege","main",mySiege,g("siegeJoin"));
+ g("siegeCount").textContent=siegeList.length+"명 참여";
+ g("siegeNames").textContent=siegeList.length?"신청: "+siegeList.map(x=>x.nickname).join(", "):"아직 신청자가 없습니다.";
+ g("marketItems").replaceChildren();
+ if(!posts.length)g("marketItems").append(elem("p","등록된 아이템 게시글이 없습니다.","muted"));
+ posts.forEach(post=>{
+   const div=elem("div",undefined,"post");div.append(elem("div","["+post.kind+"] "+post.title,"post-title"));
+   div.append(elem("small",post.nickname+" · "+new Date(post.created_at).toLocaleString("ko-KR")));
+   div.append(elem("p",post.details||"내용 없음","post-body"));
+   if(post.user_id===user.id||isAdmin()){
+     const button=elem("button","삭제","secondary");button.onclick=()=>deletePost(post.id,button);div.append(button);
+   }
+   g("marketItems").append(div);
+ });
+ if(isAdmin())fillAdminForm();
+}
+async function toggleSignup(type,id,already,button) {
+ button.disabled=true;g("siteStatus").textContent="참여 신청을 처리하는 중입니다...";
+ try {
+   const res=already
+    ?await db.from("bg_signups").delete().eq("user_id",user.id).eq("event_type",type).eq("event_id",id)
+    :await db.from("bg_signups").insert({user_id:user.id,event_type:type,event_id:id});
+   if(res.error)throw res.error;
+   await refreshAfterAction();
+ }catch(err){g("siteStatus").textContent="참여 처리 실패: "+err.message;}
+ finally{button.disabled=false;}
+}
+async function deletePost(id,button) {
+ if(!confirm("이 게시글을 삭제하시겠습니까?"))return;
+ button.disabled=true;
+ try{const r=await db.from("bg_market_posts").delete().eq("id",id);if(r.error)throw r.error;await refreshAfterAction();}
+ catch(err){alert("삭제 실패: "+err.message);}
+ finally{button.disabled=false;}
+}
+g("marketForm").onsubmit=async e=>{
+ e.preventDefault();const button=g("postSubmit");button.disabled=true;
+ try{
+   const r=await db.from("bg_market_posts").insert({
+     user_id:user.id,kind:g("postKind").value,
+     title:g("postTitle").value.trim(),details:g("postDetails").value.trim()
+   });
+   if(r.error)throw r.error;
+   e.target.reset();await refreshAfterAction();
+ }catch(err){alert("글 등록 실패: "+err.message);}
+ finally{button.disabled=false;}
+};
+async function loadApprovals() {
+ if(!isAdmin())return;
+ const target=g("approvalList");target.replaceChildren();
+ const r=await db.from("profiles").select("id,nickname,status").eq("status","pending");
+ if(r.error){target.textContent="승인 명단 오류: "+r.error.message;return;}
+ if(!r.data.length){target.textContent="승인 대기자가 없습니다.";return;}
+ r.data.forEach(p=>{
+   const div=elem("div",undefined,"item");div.append(elem("span",p.nickname||"닉네임 없음"));
+   const buttons=elem("div",undefined,"row-actions");
+   [["승인","approved"],["거절","rejected"]].forEach(([label,status])=>{
+     const b=elem("button",label,status==="rejected"?"secondary":"");
+     b.onclick=async()=>{
+       b.disabled=true;
+       try{
+         const res=await db.from("profiles").update({status}).eq("id",p.id).select("id").single();
+         if(res.error)throw res.error;
+         g("adminNotice").textContent=(p.nickname||"회원")+" · "+label+" 완료";
+         await loadApprovals();
+       }catch(err){g("adminNotice").textContent="승인 처리 실패: "+err.message;}
+       finally{b.disabled=false;}
+     };
+     buttons.append(b);
+   });div.append(buttons);target.append(div);
+ });
+}
+function fillAdminForm() {
+ g("eNotice").value=asText(cfg.notice);g("eOfficers").value=asText(cfg.officers);
+ g("eBoss").value=(cfg.bosses||[]).map(x=>x.name+"|"+x.time).join(",");
+ g("eSiegeName").value=asText(cfg.siegeName);g("ePlace").value=asText(cfg.place);g("eTime").value=asText(cfg.time);
+}
+g("adminSave").onclick=async()=>{
+ if(!isAdmin())return;
+ const button=g("adminSave");button.disabled=true;g("adminNotice").textContent="저장 중...";
+ try{
+   const old=Array.isArray(cfg.bosses)?cfg.bosses:[];
+   const used=new Set();
+   const parsed=g("eBoss").value.split(",").map(x=>x.trim()).filter(Boolean).map(line=>{
+     const parts=line.split("|");if(parts.length!==2||!parts[0].trim()||!parts[1].trim())throw Error("보스탐 형식: 보스명|시간,보스명|시간");
+     const name=parts[0].trim(),time=parts[1].trim();
+     const same=old.find(x=>x.name===name&&!used.has(x.id));
+     if(same)used.add(same.id);
+     return {id:same?.id||"boss-"+crypto.randomUUID(),name,time};
+   });
+   const updated={
+     notice:g("eNotice").value,officers:g("eOfficers").value,bosses:parsed,
+     siegeName:g("eSiegeName").value,place:g("ePlace").value,time:g("eTime").value
+   };
+   const res=await db.from("bg_content").update({body:updated,updated_at:new Date().toISOString()}).eq("id","main").select("id").single();
+   if(res.error)throw res.error;
+   await refreshContent();g("adminNotice").textContent="저장 완료! 모든 승인 회원에게 변경 내용이 적용됩니다.";
+ }catch(err){g("adminNotice").textContent="저장 실패: "+err.message;}
+ finally{button.disabled=false;}
+};
+g("authForm").onsubmit=async e=>{
+ e.preventDefault();if(!db)return message("Supabase 연결 오류입니다.");
+ const button=g("authSubmit");button.disabled=true;message("처리 중...");
+ try{
+   const email=g("authEmail").value.trim(),password=g("authPassword").value;
+   if(joinMode){
+     const nickname=g("joinNickname").value.trim();if(!nickname)throw Error("게임 닉네임을 입력하세요.");
+     const res=await db.auth.signUp({email,password,options:{data:{nickname},emailRedirectTo:REDIRECT_URL}});
+     if(res.error)throw res.error;
+     g("authPassword").value="";
+     if(res.data.session){await loadProfile();}
+     else{changeMode(false);message("가입 신청이 접수됐습니다. 이메일로 온 확인 링크를 누른 후 로그인해 주세요.");}
+   }else{
+     const res=await db.auth.signInWithPassword({email,password});
+     if(res.error)throw res.error;
+     g("authPassword").value="";
+     await loadProfile();
+   }
+ }catch(err){message("오류: "+err.message);}
+ finally{button.disabled=false;}
+};
+async function logout(){if(db)await db.auth.signOut();user=null;profile=null;cfg=null;authView("form");message("로그아웃했습니다.");}
+document.querySelectorAll("[data-logout]").forEach(b=>b.onclick=logout);
+g("checkApproval").onclick=async()=>{message("승인 상태 확인 중...");try{await loadProfile();}catch(err){message("확인 오류: "+err.message);}};
+(async()=>{if(!db)return;try{await loadProfile();}catch(err){authView("form");message("초기 연결 실패: "+err.message);}})();
+</script>
+</body>
+</html>
