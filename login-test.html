@@ -1,1 +1,206 @@
-
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>백골 혈맹 | 회원제 접속 테스트</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:#f4e4c8;background:radial-gradient(ellipse at 50% 15%,#543021,#131113 58%,#09090a);font:15px/1.6 "Malgun Gothic",sans-serif}
+main{max-width:570px;margin:5vh auto;padding:26px;background:linear-gradient(145deg,#282017,#151313);border:1px solid #a17a48;border-radius:16px;box-shadow:0 25px 60px #0008}
+h1{text-align:center;color:#efd098;font-size:40px;margin:5px 0}
+h2{font-size:20px;color:#e6be7b}
+p{color:#d9cbb6}
+.logo{text-align:center;font-size:60px}
+.sub{text-align:center;color:#d2b385;letter-spacing:2px}
+label{display:block;margin-top:14px;color:#dabe8e}
+input{display:block;width:100%;margin:6px 0;padding:12px;border-radius:8px;border:1px solid #735a3c;background:#111;color:white;font-size:16px}
+button{padding:11px 16px;border:1px solid #d09b58;border-radius:8px;background:#802b24;color:#fff7eb;cursor:pointer;font-size:15px}
+button.secondary{background:#28221c}
+button:disabled{opacity:.45;cursor:default}
+.actions{display:flex;gap:8px;margin:15px 0;flex-wrap:wrap}
+.hidden{display:none}
+#message{min-height:24px;color:#f3c985;white-space:pre-wrap}
+.entry{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #5f4938;padding:12px 0}
+.entry b{word-break:break-all}
+small{color:#ada293}
+.notice{padding:12px;background:#201a17;border-left:3px solid #c69a5d;margin:10px 0}
+footer{text-align:center;padding:25px;color:#9e9280;font-size:13px}
+@media(max-width:600px){main{margin:10px;padding:20px}h1{font-size:32px}}
+</style>
+</head>
+<body>
+<main>
+<div class="logo">💀⚔️</div>
+<h1>백골 혈맹</h1>
+<div class="sub">LINEAGE CLASSIC · MEMBERS ONLY</div>
+<div id="message" role="status"></div>
+<section id="auth">
+<div class="actions">
+<button id="loginTab">로그인</button>
+<button class="secondary" id="joinTab">회원가입 신청</button>
+</div>
+<form id="authForm">
+<h2 id="formTitle">혈맹원 로그인</h2>
+<div id="nickWrap" class="hidden">
+<label for="nick">게임 닉네임</label>
+<input id="nick" autocomplete="nickname" maxlength="24">
+</div>
+<label for="email">이메일</label>
+<input id="email" type="email" required autocomplete="email">
+<label for="password">비밀번호 (8자 이상)</label>
+<input id="password" type="password" required minlength="8" autocomplete="current-password">
+<div class="actions"><button type="submit" id="submit">로그인</button></div>
+</form>
+</section>
+<section id="pending" class="hidden">
+<h2>⏳ 운영진 승인 대기</h2>
+<p>가입 신청이 접수되었습니다. 운영진이 승인하면 전용 홈페이지를 이용할 수 있습니다.</p>
+<div class="actions">
+<button id="refresh">승인 상태 새로고침</button>
+<button class="secondary" id="logout1">로그아웃</button>
+</div>
+</section>
+<section id="rejected" class="hidden">
+<h2>접속 제한</h2>
+<p>가입 신청이 거절되었거나 계정이 차단되었습니다. 운영진에게 문의하세요.</p>
+<button id="logout2">로그아웃</button>
+</section>
+<section id="member" class="hidden">
+<h2>⚔️ 백골 혈맹 입장 승인!</h2>
+<p id="welcome"></p>
+<div class="notice">
+회원 인증 테스트가 성공했습니다.
+기존 공개 홈페이지는 아직 별도로 보호되지 않습니다.
+</div>
+<div class="actions"><button id="logout3">로그아웃</button></div>
+<section id="adminPanel" class="hidden">
+<h2>👑 운영진 회원가입 승인</h2>
+<div id="requests"></div>
+</section>
+</section>
+</main>
+<footer>백골 혈맹 · 로그인/승인 테스트 페이지</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+const URL="https://gxtzytwuiejbzdcailty.supabase.co";
+const KEY="sb_publishable_dYemgC3PUWlwb_t41o2Gmg_q7hC_-fM";
+const el=id=>document.getElementById(id);
+const db=window.supabase?.createClient(URL,KEY);
+let joining=false;
+function msg(t){el("message").textContent=t||""}
+function show(id){
+["auth","pending","rejected","member"].forEach(x=>el(x).classList.toggle("hidden",x!==id));
+}
+function tab(v){
+joining=v;
+el("nickWrap").classList.toggle("hidden",!v);
+el("nick").required=v;
+el("formTitle").textContent=v?"혈맹원 가입 신청":"혈맹원 로그인";
+el("submit").textContent=v?"가입 신청":"로그인";
+el("password").autocomplete=v?"new-password":"current-password";
+msg("");
+show("auth");
+}
+el("loginTab").onclick=()=>tab(false);
+el("joinTab").onclick=()=>tab(true);
+el("authForm").onsubmit=async e=>{
+e.preventDefault();
+if(!db)return msg("연결 오류: 인터넷 연결을 확인하세요.");
+el("submit").disabled=true;
+msg("처리 중...");
+try{
+const email=el("email").value.trim(),password=el("password").value;
+if(joining){
+const nickname=el("nick").value.trim();
+if(!nickname)throw Error("게임 닉네임을 입력하세요.");
+const {data,error}=await db.auth.signUp({email,password,options:{data:{nickname}}});
+if(error)throw error;
+if(data.session){
+msg("가입 신청 완료. 운영진 승인 대기 중입니다.");
+await load();
+}else{
+tab(false);
+msg("가입 신청이 접수되었습니다. 이메일 확인이 필요할 수 있습니다. 확인 후 로그인해 주세요.");
+}
+}else{
+const {error}=await db.auth.signInWithPassword({email,password});
+if(error)throw error;
+el("password").value="";
+await load();
+}
+}catch(err){msg("오류: "+(err.message||String(err)))}
+finally{el("submit").disabled=false}
+};
+async function load(){
+if(!db){msg("Supabase 연결 불가");return}
+try{
+const {data:{user},error}=await db.auth.getUser();
+if(error||!user){show("auth");return}
+const {data:profile,error:pe}=await db.from("profiles")
+.select("id,nickname,role,status").eq("id",user.id).single();
+if(pe)throw pe;
+if(!profile){
+msg("프로필이 없습니다. 관리자에게 문의하세요.");
+show("pending");
+return;
+}
+if(profile.status==="pending"){
+msg("");
+show("pending");
+}else if(profile.status!=="approved"){
+show("rejected");
+}else{
+show("member");
+el("welcome").textContent=profile.nickname+" 님 환영합니다.";
+const admin=profile.role==="admin";
+el("adminPanel").classList.toggle("hidden",!admin);
+if(admin)await requests();
+}
+}catch(err){show("auth");msg("회원상태 확인 실패: "+(err.message||String(err)))}
+}
+async function requests(){
+const list=el("requests");
+list.replaceChildren();
+const {data,error}=await db.from("profiles")
+.select("id,nickname,status").eq("status","pending")
+.order("created_at",{ascending:true});
+if(error){list.textContent="명단 조회 오류: "+error.message;return}
+if(!data.length){list.textContent="현재 승인 대기자가 없습니다.";return}
+for(const person of data){
+const row=document.createElement("div");
+row.className="entry";
+const name=document.createElement("b");
+name.textContent=person.nickname;
+const actions=document.createElement("div");
+for(const [label,status] of [["승인","approved"],["거절","rejected"]]){
+const b=document.createElement("button");
+b.className=status==="rejected"?"secondary":"";
+b.textContent=label;
+b.onclick=async()=>{
+b.disabled=true;
+const {error}=await db.from("profiles").update({status}).eq("id",person.id);
+if(error){msg("변경 오류: "+error.message);b.disabled=false}
+else{msg(person.nickname+" · "+label+" 완료");await requests()}
+};
+actions.append(b);
+}
+row.append(name,actions);
+list.append(row);
+}
+}
+async function logout(){
+await db.auth.signOut();
+show("auth");
+msg("로그아웃했습니다.");
+}
+el("logout1").onclick=logout;
+el("logout2").onclick=logout;
+el("logout3").onclick=logout;
+el("refresh").onclick=load;
+if(db)load();
+else msg("Supabase 스크립트 오류: 인터넷 연결을 확인하세요.");
+</script>
+</body>
+</html>
