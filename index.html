@@ -1,1 +1,116 @@
-
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>백골 혈맹 | 리니지 클래식</title>
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at top,#39231b,#0b0b0e 60%);color:#f3e5cf;font:15px/1.6 "Malgun Gothic",sans-serif}
+header{text-align:center;padding:65px 15px;background:linear-gradient(145deg,#17171d,#48251b,#090c12);border-bottom:3px solid #b78842}
+.logo{font-size:65px}
+h1{font: bold clamp(44px,7vw,80px) Georgia,serif;color:#f1cc80;text-shadow:3px 5px #46251e;margin:7px}
+header p{color:#eddfc5;font-size:18px}
+nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:15px;background:#151313;border-bottom:1px solid #705337}
+nav a{color:#f0ca8d;text-decoration:none;padding:10px 15px;border:1px solid #745536;border-radius:6px;background:#211914}
+main{max-width:1100px;margin:auto;padding:22px 14px}
+.banner{padding:20px;border:1px solid #a07641;background:#302017;border-radius:10px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{background:linear-gradient(#28221c,#121113);border:1px solid #755838;border-radius:12px;overflow:hidden}
+.card h2{background:#39251b;color:#f2c77a;padding:13px 18px;margin:0;font-size:21px}
+.content{padding:18px}
+.wide{grid-column:1/-1}
+.item{padding:12px 0;border-bottom:1px solid #4b3b2c;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.item:last-child{border:0}
+button{cursor:pointer;background:#853025;border:1px solid #c88a52;color:white;border-radius:6px;padding:9px 15px;font:inherit}
+button.secondary{background:#332b26}
+input,textarea{background:#111;color:white;border:1px solid #8b6745;padding:9px;border-radius:6px;font:inherit;max-width:100%}
+textarea{width:100%;min-height:80px}
+label{display:block;margin-top:14px;color:#edc78c}
+small{color:#bcb0a0}
+details{margin-top:20px;padding:18px;border:1px solid #86613c;border-radius:9px;background:#211a16}
+summary{cursor:pointer;font-weight:bold;color:#f1c580}
+footer{text-align:center;padding:35px;color:#aa9b85}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}header{padding:40px 10px}nav a{flex:1 1 42%;text-align:center;padding:9px 5px}}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">💀⚔️</div>
+<div style="color:#f3c982;letter-spacing:3px">LINEAGE CLASSIC · BAEKGOL CLAN</div>
+<h1>백골 혈맹</h1>
+<p>의리는 뼈에 새기고, 전장은 이름으로 지배한다.</p>
+</header>
+<nav>
+<a href="#notice">📜 공지사항</a>
+<a href="#intro">🛡️ 혈맹소개</a>
+<a href="#boss">🐉 보스탐 시간표&참여</a>
+<a href="#siege">🏰 공성참여</a>
+<a href="#market">💰 아이템 내판</a>
+</nav>
+<main>
+<div class="banner">⚔️ 백골 혈맹에 오신 것을 환영합니다! <small>현재는 기능 체험판입니다. 실제 회원가입 시스템은 추후 연결됩니다.</small></div>
+<div class="grid">
+<section class="card" id="notice"><h2>📜 공지사항</h2><div class="content" id="noticeText"></div></section>
+<section class="card" id="intro"><h2>🛡️ 혈맹소개</h2><div class="content"><p>쟁·전투·보스탐·공성전 함께하는 백골 혈맹!</p><b>운영진 명단</b><div id="officers"></div></div></section>
+<section class="card wide" id="boss"><h2>🐉 보스탐 시간표 & 참여</h2><div class="content"><small>출현 시간은 예시입니다. 수정할 수 있습니다.</small><div id="bossList"></div></div></section>
+<section class="card" id="siege"><h2>🏰 공성참여</h2><div class="content"><h3 id="siegeName"></h3><p>📍 <span id="siegePlace"></span> · 🕢 <span id="siegeTime"></span> 집결</p><button id="siegeJoin">참여 신청</button><p id="siegeStatus"></p></div></section>
+<section class="card" id="market"><h2>💰 아이템 내판</h2><div class="content"><p>혈맹원 아이템 판매·구매 게시판</p><small>회원 전용 글쓰기 기능 연결 예정</small></div></section>
+</div>
+<section class="card" style="margin-top:20px">
+<h2>🎮 내 게임 닉네임</h2>
+<div class="content"><input id="nick" placeholder="게임 닉네임"><button id="nickSave">닉네임 저장</button><p><small>참여 기록은 현재 내 브라우저에만 저장됩니다.</small></p></div>
+</section>
+<details><summary>⚙️ 관리자 수정 체험 열기</summary>
+<p><small>체험용 편집 기능입니다. 실제 관리자 보안과 서버 저장은 아직 없습니다.</small></p>
+<label>공지사항</label><textarea id="eNotice"></textarea>
+<label>운영진 (직책:닉네임, 쉼표 구분)</label><textarea id="eOfficers"></textarea>
+<label>보스탐 (보스명|시간, 쉼표 구분)</label><textarea id="eBoss"></textarea>
+<label>공성전 이름</label><input id="eSiegeName">
+<label>집결 장소</label><input id="ePlace">
+<label>집결 시간</label><input id="eTime">
+<p><button id="adminSave">수정 내용 저장</button></p>
+</details>
+</main>
+<footer>☠️ 백골 혈맹 · 비공식 팬 커뮤니티</footer>
+<script>
+const g=id=>document.getElementById(id);
+const initial={notice:"백골 혈맹 홈페이지에 오신 것을 환영합니다.",officers:"군주:테스토스테론,부군주:달룡,간부:제라,간부:주성치,간부:싱,간부:티츄,간부:청춘",boss:"데스나이트|21:00,바포메트|22:00,커츠|23:00",siegeName:"백골 혈맹 공성전",place:"혈맹 아지트",time:"19:30"};
+let d;
+try{d=Object.assign({},initial,JSON.parse(localStorage.getItem("bgData")||"{}"))}catch(e){d={...initial}}
+let joined;
+try{joined=JSON.parse(localStorage.getItem("bgJoined")||"{}")}catch(e){joined={}}
+g("nick").value=localStorage.getItem("bgNick")||"";
+function nickCheck(){if(!g("nick").value.trim()){alert("게임 닉네임을 먼저 입력해주세요.");return false}localStorage.setItem("bgNick",g("nick").value.trim());return true}
+g("nickSave").onclick=()=>{if(nickCheck())alert("닉네임을 저장했습니다.")};
+function row(parent,left,right){let div=document.createElement("div");div.className="item";let a=document.createElement("span");a.textContent=left;let b=document.createElement("span");b.textContent=right;div.append(a,b);parent.append(div)}
+function toggle(key){if(!nickCheck())return;joined[key]=!joined[key];localStorage.setItem("bgJoined",JSON.stringify(joined));render()}
+function render(){
+g("noticeText").textContent=d.notice;
+g("siegeName").textContent=d.siegeName;
+g("siegePlace").textContent=d.place;
+g("siegeTime").textContent=d.time;
+g("siegeJoin").textContent=joined.siege?"참여 취소":"참여 신청";
+g("siegeStatus").textContent=joined.siege?"신청 완료 (이 기기만)":"미신청";
+g("officers").replaceChildren();
+d.officers.split(",").filter(Boolean).forEach(s=>{let a=s.split(":");row(g("officers"),a[0]||"운영진",a.slice(1).join(":"))});
+g("bossList").replaceChildren();
+d.boss.split(",").filter(Boolean).forEach((s,i)=>{
+let a=s.split("|"),key="boss"+i;
+let div=document.createElement("div");div.className="item";
+let label=document.createElement("span");label.textContent=(a[0]||"보스")+" · "+(a[1]||"시간 미정");
+let btn=document.createElement("button");btn.className=joined[key]?"secondary":"";
+btn.textContent=joined[key]?"참여 취소":"참여 신청";
+btn.onclick=()=>toggle(key);div.append(label,btn);g("bossList").append(div);
+});
+}
+g("siegeJoin").onclick=()=>toggle("siege");
+function fill(){g("eNotice").value=d.notice;g("eOfficers").value=d.officers;g("eBoss").value=d.boss;g("eSiegeName").value=d.siegeName;g("ePlace").value=d.place;g("eTime").value=d.time}
+g("adminSave").onclick=()=>{
+d={notice:g("eNotice").value,officers:g("eOfficers").value,boss:g("eBoss").value,siegeName:g("eSiegeName").value,place:g("ePlace").value,time:g("eTime").value};
+localStorage.setItem("bgData",JSON.stringify(d));render();alert("이 브라우저에 수정 내용이 저장되었습니다.");
+};
+fill();render();
+</script>
+</body></html>
